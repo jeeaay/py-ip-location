@@ -1,9 +1,10 @@
+# -*- coding=utf-8 -*-
 from xdbSearcher import XdbSearcher
 import requests
 import json
 from datetime import datetime, timezone, timedelta
 from db import Db
-class IP2Reg:
+class IP2Location:
     def __init__(self, ip = None):
         self.ip = ip
         dt = datetime.now(timezone(timedelta(hours=+8)))
@@ -116,8 +117,8 @@ if __name__ == "__main__":
     # 用时估算
     import time
     start_time = time.time()
-    # ip = IP2Reg('8.8.8.8')
-    ip = IP2Reg('2406:da14:2e4:8900:b5fc:b35a:34d0:93f6')
+    # ip = IP2Location('8.8.8.8')
+    ip = IP2Location('2406:da14:2e4:8900:b5fc:b35a:34d0:93f6')
     # dt = datetime.now(timezone(timedelta(hours=+8)))
     # print(dt)
 

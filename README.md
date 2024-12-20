@@ -18,6 +18,8 @@ region = ip2reg.search('8.8.8.8')
 
 Example file 示例文件:   `example1_flask.py`
 
+Example API documentation 示例的API文档： `api.http`
+
 insstall Flask 安装Flask:
 
 ```bash
