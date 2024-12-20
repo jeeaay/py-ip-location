@@ -9,9 +9,9 @@ Get geographic location through IP address, support IPv4 and IPv6. Combine IP ad
 ## How to use 使用方法
 
 ```python
-from IP2Reg import IP2Reg
-ip2reg = IP2Reg()
-region = ip2reg.search('8.8.8.8')
+from ip2location import IP2Location
+ip2location = IP2Location()
+region = ip2location.search('8.8.8.8')
 ```
 
 ## Use in Flask 结合Flask使用
@@ -38,17 +38,17 @@ http://127.0.0.1:5000/ip/<search ip>
 
 ```python
 from flask import Flask, jsonify, request
-from IP2Reg import IP2Reg
+from ip2location import IP2Location
 import json
 app = Flask(__name__)
 @app.route("/ip/<ip>")
 def get_ip(ip=None):
     # json
     if not request.args.get('callback') or request.args.get('callback').strip() == '':
-        return jsonify(IP2Reg(ip).search())
+        return jsonify(IP2Location(ip).search())
     # jsonp
     else:
-        return request.args.get('callback') + "(" + json.dumps(IP2Reg(ip).search()) + ")"
+        return request.args.get('callback') + "(" + json.dumps(IP2Location(ip).search()) + ")"
 if __name__ == "__main__":
     app.run(debug=True)
 ```
@@ -60,3 +60,23 @@ Apache-2.0 License
 ## Source code
 
 https://github.com/jeeaay/py-ip-location
+
+## Upload to pypi
+
+install twine and build
+
+```bash
+pip install twine build
+```
+
+build
+
+```bash
+python -m build
+```
+
+upload
+
+```bash
+twine upload dist/*
+```

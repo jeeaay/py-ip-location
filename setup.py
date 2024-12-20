@@ -13,8 +13,8 @@ from setuptools import setup, find_packages
 filepath = 'README.md'
 setup(
     name = "ip2loaction",
-    version = "0.0.1",
-    keywords = ("ip loaction", "ip country", "ip region", "IP address loaction", "IP geographic location"),
+    version = "0.0.2",
+    keywords = ["ip loaction", "ip country", "ip region", "IP address loaction", "IP geographic location"],
     description = "Get geographic location through IP address, support IPv4 and IPv6. Combine IP address library and online API.",
     long_description = open(filepath, encoding='utf-8').read(),
     long_description_content_type='text/markdown',

@@ -1,8 +1,10 @@
 # -*- coding=utf-8 -*-
-from xdbSearcher import XdbSearcher
 import requests
-import json
+import json, sys, os
 from datetime import datetime, timezone, timedelta
+cur_path = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(cur_path)
+from xdbSearcher import XdbSearcher
 from db import Db
 class IP2Location:
     def __init__(self, ip = None):
@@ -52,7 +54,7 @@ class IP2Location:
     def searchWithFile(self):
         try:
             # 创建查询对象
-            dbPath = "./ip2region.xdb"
+            dbPath = os.path.join(cur_path, "ip2region.xdb")
             searcher = XdbSearcher(dbfile=dbPath)
         except Exception as e:
             searcher.close()
