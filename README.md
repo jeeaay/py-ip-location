@@ -50,3 +50,11 @@ def get_ip(ip=None):
 if __name__ == "__main__":
     app.run(debug=True)
 ```
+
+## LICENSE
+
+Apache-2.0 License
+
+## Source code
+
+https://github.com/jeeaay/python-file-cache
