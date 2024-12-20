@@ -13,3 +13,40 @@ from IP2Reg import IP2Reg
 ip2reg = IP2Reg()
 region = ip2reg.search('8.8.8.8')
 ```
+
+## Use in Flask 结合Flask使用
+
+Example file 示例文件:   `example1_flask.py`
+
+insstall Flask 安装Flask:
+
+```bash
+pip install flask
+```
+
+run 运行:
+```bash
+python example1_flask.py
+```
+
+visit 访问本地测试路径:
+```
+http://127.0.0.1:5000/ip/<search ip>
+```
+
+```python
+from flask import Flask, jsonify, request
+from IP2Reg import IP2Reg
+import json
+app = Flask(__name__)
+@app.route("/ip/<ip>")
+def get_ip(ip=None):
+    # json
+    if not request.args.get('callback') or request.args.get('callback').strip() == '':
+        return jsonify(IP2Reg(ip).search())
+    # jsonp
+    else:
+        return request.args.get('callback') + "(" + json.dumps(IP2Reg(ip).search()) + ")"
+if __name__ == "__main__":
+    app.run(debug=True)
+```
