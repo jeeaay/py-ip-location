@@ -1,0 +1,12 @@
+@baseUrl = http://127.0.0.1:5000/
+@token = G6AqW8uqKvsabwfL
+
+
+### 获取IP对应位置
+GET {{baseUrl}}/ip/{{token}}/8.8.8.8
+
+### 获取IPv6对应位置
+GET {{baseUrl}}/ip/{{token}}/2406:da14:2e4:8900:b5fc:b35a:34d0:93f6
+
+### 获取IP对应位置, 使用jsonp, callbackFunction可以自定义
+GET {{baseUrl}}/ip/{{token}}/8.8.8.8?callback=callbackFunction
