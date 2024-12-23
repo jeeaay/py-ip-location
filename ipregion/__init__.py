@@ -15,13 +15,16 @@ class IP2Region:
     def search(self, ip=None):
         if self.ip is None:
             self.ip = ip
-        # 使用本地数据库搜索IP地址
-        result = self.searchWithFile()
-        if result['errno'] == 0:
-            return result
         # 使用缓存SQLite数据库搜索IP地址
         result = self.searchWithCache()
         if result['errno'] == 0:
+            return result
+        # 使用ipwho.is
+        result = self.searchWithIpWhoIs()
+        if result['errno'] == 0:
+            # 存入缓存SQLite数据库
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data'], result['source'], self.now))
+            self.db.commit()
             return result
         # 使用ip-api搜索IP地址
         result = self.searchWithIpApi()
@@ -29,6 +32,10 @@ class IP2Region:
             # 存入缓存SQLite数据库
             self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=[self.ip, result['data'], result['source'], self.now])
             self.db.commit()
+            return result
+        # 使用本地数据库搜索IP地址
+        result = self.searchWithFile()
+        if result['errno'] == 0:
             return result
         # 使用ip.sb搜索IP地址
         result = self.searchWithIpSb()
@@ -62,7 +69,6 @@ class IP2Region:
         try:
             # 执行查询
             region_str = searcher.searchByIPStr(self.ip)
-            # print(region_str)
             # 以|分割
             region_list = region_str.split('|')
             # 忽略为0的内容
@@ -80,9 +86,7 @@ class IP2Region:
     # param: string lang 可选参数，默认为中文
     # return: list
     def searchWithIpApi(self, lang="zh-CN"):
-        url = f"http://ip-api.com/json/{self.ip}"
-        if lang:
-            url = url + "?lang={lang}"
+        url = f"http://ip-api.com/json/{self.ip}?lang={lang}"
         try:
             response = requests.get(url)
             data = response.json()
@@ -103,8 +107,6 @@ class IP2Region:
         }
         try:
             response = requests.get(url, headers=headers)
-            print(url)
-            print(response.text)
             data = json.loads(response.text)
             if 'code' in set(data) and data['code'] >= '400' or data['ip'] != self.ip:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
@@ -115,6 +117,27 @@ class IP2Region:
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
                 else:
                     return {"errno": 0, "data":f"{country} {region}".strip(), "source": "searchWithIpSb"}
+        except Exception as e:
+            return {"errno": 2, "msg":"上游服务异常", "data": e}
+
+    # description: 使用ipwho.is搜索IP地址
+    # param: string ip
+    # param: string lang 可选参数，默认为中文
+    # return: list
+    def searchWithIpWhoIs(self, lang="zh-CN"):
+        url = f"http://ipwho.is/{self.ip}?lang={lang}"
+        try:
+            response = requests.get(url)
+            data = json.loads(response.text)
+            if 'success' in set(data) and data['success'] == False:
+                return {"errno": 1, "msg":"没有找到IP地址", "data": data}
+            else:
+                # country = data['country'] if 'country' in set(data) != '' else ''
+                region = data['region'] if 'region' in set(data) != '' else ''
+                if region == '':
+                    return {"errno": 1, "msg":"没有找到IP地址", "data": data}
+                else:
+                    return {"errno": 0, "data":f"{region}".strip(), "source": "searchWithIpWhoIs"}
         except Exception as e:
             return {"errno": 2, "msg":"上游服务异常", "data": e}
 
