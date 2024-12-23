@@ -6,7 +6,7 @@ cur_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(cur_path)
 from xdbSearcher import XdbSearcher
 from db import Db
-class IP2Location:
+class IP2Region:
     def __init__(self, ip = None):
         self.ip = ip
         dt = datetime.now(timezone(timedelta(hours=+8)))
@@ -77,9 +77,12 @@ class IP2Location:
 
     # description: 使用ip-api搜索IP地址
     # param: string ip
+    # param: string lang 可选参数，默认为中文
     # return: list
-    def searchWithIpApi(self):
-        url = f"http://ip-api.com/json/{self.ip}?lang=zh-CN"
+    def searchWithIpApi(self, lang="zh-CN"):
+        url = f"http://ip-api.com/json/{self.ip}"
+        if lang:
+            url = url + "?lang={lang}"
         try:
             response = requests.get(url)
             data = response.json()
@@ -119,14 +122,7 @@ if __name__ == "__main__":
     # 用时估算
     import time
     start_time = time.time()
-    # ip = IP2Location('8.8.8.8')
-    ip = IP2Location('2406:da14:2e4:8900:b5fc:b35a:34d0:93f6')
-    # dt = datetime.now(timezone(timedelta(hours=+8)))
-    # print(dt)
-
-    # print(dt.strftime('%Y-%m-%d %H:%M:%S'))
+    ip = IP2Region('2406:da14:2e4:8900:b5fc:b35a:34d0:93f6')
     print(ip.search())
     # 显示毫米，保留整数
     print("%d ms" % ((time.time() - start_time) * 1000))
-    # db = Db()
-    # db.query("select * from ip2region")

@@ -6,22 +6,22 @@ Get geographic location through IP address, support IPv4 and IPv6. Combine IP ad
 
 通过IP地址获取地理位置，支持IPv4和IPv6。结合了IP地址库和在线API。本地的IP地址库来自项目[lionsoul2014/ip2region](https://github.com/lionsoul2014/ip2region)，在线API来自`ip-api`、`ip.sb`。
 
-Pypi: [ip2loaction](https://pypi.org/project/ip-location/)
+Pypi: [ipregion](https://pypi.org/project/ipregion/)
 
 ## How to use 使用方法
 
 Install 安装：
 
 ```bash
-pip install ip2loaction
+pip install ip-region
 ```
 
 Use 使用：
 
 ```python
-from ip2location import IP2Location
-ip2location = IP2Location()
-region = ip2location.search('8.8.8.8')
+from ipregion import IP2Region
+ip2region = IP2Region()
+region = ip2region.search('8.8.8.8')
 ```
 
 ## Use in Flask 结合Flask使用
@@ -61,17 +61,19 @@ Example code 示例代码:
 
 ```python
 from flask import Flask, jsonify, request
-from ip2location import IP2Location
+from ipregion import IP2Region
 import json
 app = Flask(__name__)
 @app.route("/ip/<ip>")
 def get_ip(ip=None):
+    ip2region = IP2Region()
+    region = ip2region.search(ip)
     # json
     if not request.args.get('callback') or request.args.get('callback').strip() == '':
-        return jsonify(IP2Location(ip).search())
+        return jsonify(region)
     # jsonp
     else:
-        return request.args.get('callback') + "(" + json.dumps(IP2Location(ip).search()) + ")"
+        return request.args.get('callback') + "(" + json.dumps(region) + ")"
 if __name__ == "__main__":
     app.run(debug=True)
 ```

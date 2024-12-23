@@ -1,5 +1,5 @@
 from flask import Flask, jsonify, request
-from IP2Reg import IP2Reg
+from ipregion import IP2Region
 import json
 
 # insstall flask:   pip install flask
@@ -7,21 +7,15 @@ import json
 # visit:            http://127.0.0.1:5000/ip/<search ip>
 
 app = Flask(__name__)
-
-@app.route("/")
-def home():
-    return f"<p>Hello, World!</p>"
-
-
 @app.route("/ip/<ip>")
 def get_ip(ip=None):
+    ip2region = IP2Region()
+    region = ip2region.search(ip)
     # json
     if not request.args.get('callback') or request.args.get('callback').strip() == '':
-        return jsonify(IP2Reg(ip).search())
+        return jsonify(region)
     # jsonp
     else:
-        return request.args.get('callback') + "(" + json.dumps(IP2Reg(ip).search()) + ")"
-
+        return request.args.get('callback') + "(" + json.dumps(region) + ")"
 if __name__ == "__main__":
-    # searchWithFile('8.8.8.8')
     app.run(debug=True)

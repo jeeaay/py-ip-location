@@ -1,4 +1,4 @@
-from ip2location import IP2Location
-ip2location = IP2Location()
-region = ip2location.search('8.8.8.8')
+from ipregion import IP2Region
+ip2region = IP2Region()
+region = ip2region.search('8.8.8.8')
 print(region)
