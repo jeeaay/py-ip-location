@@ -27,14 +27,14 @@ class IP2Region:
         result = self.searchWithIpApi()
         if result['errno'] == 0:
             # 存入缓存SQLite数据库
-            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=[self.ip, result['date'], result['source'], self.now])
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=[self.ip, result['data'], result['source'], self.now])
             self.db.commit()
             return result
         # 使用ip.sb搜索IP地址
         result = self.searchWithIpSb()
         if result['errno'] == 0:
             # 存入缓存SQLite数据库
-            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['date'], result['source'], self.now))
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data'], result['source'], self.now))
             self.db.commit()
             return result
 
@@ -44,7 +44,7 @@ class IP2Region:
     def searchWithCache(self):
         result = self.db.query("SELECT * FROM ip2region WHERE ip = ?", (self.ip,), True)
         if result:
-            return {"errno": 0, "date": result['region'], "source": f"Cache From {result['source']} at {result['create_time']}"}
+            return {"errno": 0, "data": result['region'], "source": f"Cache From {result['source']} at {result['create_time']}"}
         else:
             return {"errno": 1, "msg": "未找到IP地址"}
 
@@ -70,7 +70,7 @@ class IP2Region:
             # 拼接字符串
             region_str = ' '.join(region_list)
             searcher.close()
-            return {"errno": 0, "date": f"{region_str}", "source": "searchWithFile"}
+            return {"errno": 0, "data": f"{region_str}", "source": "searchWithFile"}
         except Exception as e:
             searcher.close()
             return {"errno": 2, "msg": "本地ip数据读取失败", "data": e}
@@ -87,7 +87,7 @@ class IP2Region:
             response = requests.get(url)
             data = response.json()
             if data['status'] == 'success':
-                return {"errno": 0, "date":f"{data['country']} {data['regionName']}", "source": "searchWithIpApi"}
+                return {"errno": 0, "data":f"{data['country']} {data['regionName']}", "source": "searchWithIpApi"}
             else:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
         except Exception as e:
@@ -114,7 +114,7 @@ class IP2Region:
                 if country == '' and region == '':
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
                 else:
-                    return {"errno": 0, "date":f"{country} {region}".strip(), "source": "searchWithIpSb"}
+                    return {"errno": 0, "data":f"{country} {region}".strip(), "source": "searchWithIpSb"}
         except Exception as e:
             return {"errno": 2, "msg":"上游服务异常", "data": e}
 
