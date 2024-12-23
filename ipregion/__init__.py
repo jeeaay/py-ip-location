@@ -48,7 +48,9 @@ class IP2Region:
     # description: 使用缓存SQLite数据库搜索IP地址
     # param: string ip
     # return: list
-    def searchWithCache(self):
+    def searchWithCache(self, ip=None):
+        if self.ip is None:
+            self.ip = ip
         result = self.db.query("SELECT * FROM ip2region WHERE ip = ?", (self.ip,), True)
         if result:
             return {"errno": 0, "data": result['region'], "source": f"Cache From {result['source']} at {result['create_time']}"}
@@ -58,7 +60,9 @@ class IP2Region:
     # description: 使用本地数据库搜索IP地址
     # param: string ip
     # return: list
-    def searchWithFile(self):
+    def searchWithFile(self, ip=None):
+        if self.ip is None:
+            self.ip = ip
         try:
             # 创建查询对象
             dbPath = os.path.join(cur_path, "ip2region.xdb")
@@ -85,7 +89,9 @@ class IP2Region:
     # param: string ip
     # param: string lang 可选参数，默认为中文
     # return: list
-    def searchWithIpApi(self, lang="zh-CN"):
+    def searchWithIpApi(self, ip=None, lang="zh-CN"):
+        if self.ip is None:
+            self.ip = ip
         url = f"http://ip-api.com/json/{self.ip}?lang={lang}"
         try:
             response = requests.get(url)
@@ -100,7 +106,9 @@ class IP2Region:
     # description: 使用ip.sb搜索IP地址
     # param: string ip
     # return: list
-    def searchWithIpSb(self):
+    def searchWithIpSb(self, ip=None):
+        if self.ip is None:
+            self.ip = ip
         url = f"https://api.ip.sb/geoip/{self.ip}"
         headers = {
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.3"
@@ -124,7 +132,9 @@ class IP2Region:
     # param: string ip
     # param: string lang 可选参数，默认为中文
     # return: list
-    def searchWithIpWhoIs(self, lang="zh-CN"):
+    def searchWithIpWhoIs(self, ip=None, lang="zh-CN"):
+        if self.ip is None:
+            self.ip = ip
         url = f"http://ipwho.is/{self.ip}?lang={lang}"
         try:
             response = requests.get(url)
