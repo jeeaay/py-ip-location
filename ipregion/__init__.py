@@ -21,7 +21,7 @@ class IP2Region:
         except Exception as e:
             return {'errno': 1, 'data': e, 'msg': 'Invalid IP address'}
         if ip_obj.is_private:
-            return {'errno': 0, 'data': '私有地址 Private IP', 'source': 'Private IP'}
+            return {'errno': 0, 'data': {"region": '私有地址 Private IP', "ip": self.ip}, 'source': 'Private IP'}
         # 使用缓存SQLite数据库搜索IP地址
         result = self.searchWithCache()
         if result['errno'] == 0:
@@ -30,14 +30,14 @@ class IP2Region:
         result = self.searchWithIpWhoIs()
         if result['errno'] == 0:
             # 存入缓存SQLite数据库
-            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data'], result['source'], self.now))
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data']['region'], result['source'], self.now))
             self.db.commit()
             return result
         # 使用ip-api搜索IP地址
         result = self.searchWithIpApi()
         if result['errno'] == 0:
             # 存入缓存SQLite数据库
-            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=[self.ip, result['data'], result['source'], self.now])
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=[self.ip, result['data']['region'], result['source'], self.now])
             self.db.commit()
             return result
         # 使用本地数据库搜索IP地址
@@ -48,7 +48,7 @@ class IP2Region:
         result = self.searchWithIpSb()
         if result['errno'] == 0:
             # 存入缓存SQLite数据库
-            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data'], result['source'], self.now))
+            self.db.query("INSERT INTO ip2region (ip, region, source, create_time) VALUES (?, ?, ?, ?)", args=(self.ip, result['data']['region'], result['source'], self.now))
             self.db.commit()
             return result
 
