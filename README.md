@@ -126,3 +126,12 @@ upload
 ```bash
 twine upload dist/*
 ```
+
+or use one line command
+
+```bash
+rm -rf ip_region.egg-info dist && python -m build && twine upload dist/*
+
+# windows
+DEL /S /Q ip_region.egg-info dist && python -m build && twine upload dist/*
+```
