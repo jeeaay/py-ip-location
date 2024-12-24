@@ -1,6 +1,6 @@
 # -*- coding=utf-8 -*-
 import requests
-import json, sys, os
+import json, sys, os, ipaddress
 from datetime import datetime, timezone, timedelta
 cur_path = os.path.abspath(os.path.dirname(__file__))
 sys.path.append(cur_path)
@@ -15,6 +15,13 @@ class IP2Region:
     def search(self, ip=None):
         if self.ip is None:
             self.ip = ip
+        # 先判断是否是私有地址
+        try:
+            ip_obj = ipaddress.ip_address(self.ip)
+        except Exception as e:
+            return {'errno': 1, 'data': e, 'msg': 'Invalid IP address'}
+        if ip_obj.is_private:
+            return {'errno': 0, 'data': '私有地址 Private IP', 'source': 'Private IP'}
         # 使用缓存SQLite数据库搜索IP地址
         result = self.searchWithCache()
         if result['errno'] == 0:
@@ -75,10 +82,13 @@ class IP2Region:
             region_str = searcher.searchByIPStr(self.ip)
             # 以|分割
             region_list = region_str.split('|')
-            # 忽略为0的内容
-            region_list = [i for i in region_list if i != '0']
+            res = []
+            # 忽略为0的内容，忽略重复内容
+            for i in region_list:
+                if i not in res and i != '' and i != '0':
+                    res.append(i)
             # 拼接字符串
-            region_str = ' '.join(region_list)
+            region_str = ' '.join(res)
             searcher.close()
             return {"errno": 0, "data": f"{region_str}", "source": "searchWithFile"}
         except Exception as e:

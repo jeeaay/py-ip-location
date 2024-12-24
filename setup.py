@@ -13,7 +13,7 @@ from setuptools import setup, find_packages
 filepath = 'README.md'
 setup(
     name = "ip-region",
-    version = "1.0.2",
+    version = "1.0.3",
     keywords = ["ip loaction", "ip country", "ip region", "IP address loaction", "IP geographic location"],
     description = "Get geographic location through IP address, support IPv4 and IPv6. Combine IP address library and online API.",
     long_description = open(filepath, encoding='utf-8').read(),
