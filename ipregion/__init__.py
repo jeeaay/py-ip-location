@@ -124,7 +124,9 @@ class IP2Region:
                 if country == '' and region == '':
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
                 else:
-                    return {"errno": 0, "data":f"{country} {region}".strip(), "source": "searchWithIpSb"}
+                    if country != region:
+                        region = f"{country} {region}"
+                    return {"errno": 0, "data":f"{region}".strip(), "source": "searchWithIpSb"}
         except Exception as e:
             return {"errno": 2, "msg":"上游服务异常", "data": e}
 
