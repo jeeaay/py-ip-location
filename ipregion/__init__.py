@@ -60,7 +60,7 @@ class IP2Region:
             self.ip = ip
         result = self.db.query("SELECT * FROM ip2region WHERE ip = ?", (self.ip,), True)
         if result:
-            return {"errno": 0, "data": result['region'], "source": f"Cache From {result['source']} at {result['create_time']}"}
+            return {"errno": 0, "data": {"region": result['region'], "ip": self.ip}, "source": f"Cache From {result['source']} at {result['create_time']}"}
         else:
             return {"errno": 1, "msg": "未找到IP地址"}
 
@@ -88,9 +88,9 @@ class IP2Region:
                 if i not in res and i != '' and i != '0':
                     res.append(i)
             # 拼接字符串
-            region_str = ' '.join(res)
+            region_str = ' '.join(res).strip()
             searcher.close()
-            return {"errno": 0, "data": f"{region_str}", "source": "searchWithFile"}
+            return {"errno": 0, "data": {"region": region_str, "ip": self.ip}, "source": "searchWithFile"}
         except Exception as e:
             searcher.close()
             return {"errno": 2, "msg": "本地ip数据读取失败", "data": e}
@@ -107,7 +107,13 @@ class IP2Region:
             response = requests.get(url)
             data = response.json()
             if data['status'] == 'success':
-                return {"errno": 0, "data":f"{data['country']} {data['regionName']}", "source": "searchWithIpApi"}
+                country = data['country'].strip() if 'country' in set(data) != '' else ''
+                region = data['regionName'].strip() if 'region' in set(data) != '' else ''
+                if country == '' and region == '':
+                    return {"errno": 1, "msg":"没有找到IP地址", "data": data}
+                if country != region:
+                    region = f"{country} {region}".strip()
+                return {"errno": 0, "data": {"region": region, "ip": self.ip}, "source": "searchWithIpApi"}
             else:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
         except Exception as e:
@@ -129,14 +135,13 @@ class IP2Region:
             if 'code' in set(data) and data['code'] >= '400' or data['ip'] != self.ip:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
             else:
-                country = data['country'] if 'country' in set(data) != '' else ''
-                region = data['region'] if 'region' in set(data) != '' else ''
+                country = data['country'].strip() if 'country' in set(data) != '' else ''
+                region = data['region'].strip() if 'region' in set(data) != '' else ''
                 if country == '' and region == '':
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
-                else:
-                    if country != region:
-                        region = f"{country} {region}"
-                    return {"errno": 0, "data":f"{region}".strip(), "source": "searchWithIpSb"}
+                if country != region:
+                    region = f"{country} {region}".strip()
+                return {"errno": 0, "data":{"region": region, "ip": self.ip}, "source": "searchWithIpSb"}
         except Exception as e:
             return {"errno": 2, "msg":"上游服务异常", "data": e}
 
@@ -154,12 +159,16 @@ class IP2Region:
             if 'success' in set(data) and data['success'] == False:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
             else:
-                # country = data['country'] if 'country' in set(data) != '' else ''
-                region = data['region'] if 'region' in set(data) != '' else ''
+                region = data['region'].strip() if 'region' in set(data) != '' else ''
                 if region == '':
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
-                else:
-                    return {"errno": 0, "data":f"{region}".strip(), "source": "searchWithIpWhoIs"}
+                res = []
+                # 用,分割 去除重复
+                for item in region.split(','):
+                    if item not in res:
+                        res.append(item)
+                region = ','.join(res)
+                return {"errno": 0, "data": {"region": region, "ip": self.ip}, "source": "searchWithIpWhoIs"}
         except Exception as e:
             return {"errno": 2, "msg":"上游服务异常", "data": e}
 
