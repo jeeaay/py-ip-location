@@ -1,2 +1,3 @@
-recursive-include ipregion ip2region.xdb
+recursive-include ipregion ip2region.xdb ipcache.sample.db3
 exclude ipregion/ip.db3
+exclude ipregion/ipcache.db3

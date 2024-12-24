@@ -7,11 +7,11 @@ sys.path.append(cur_path)
 from xdbSearcher import XdbSearcher
 from db import Db
 class IP2Region:
-    def __init__(self, ip = None):
+    def __init__(self, ip = None, db_path = None):
         self.ip = ip
         dt = datetime.now(timezone(timedelta(hours=+8)))
         self.now = dt.strftime('%Y-%m-%d %H:%M:%S')
-        self.db = Db()
+        self.db = Db(db_path)
     def search(self, ip=None):
         if self.ip is None:
             self.ip = ip

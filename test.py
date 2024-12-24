@@ -9,3 +9,13 @@ ip2region = IP2Region('178.171.89.95')
 region = ip2region.search()
 
 print(region)
+
+# 实例化时指定缓存路径
+# Specify the cache path when instantiating
+import os
+cur_path = os.path.abspath(os.path.dirname(__file__))
+db_path = os.path.join(cur_path, "ipcache.db3")
+ip2region = IP2Region( db_path = db_path)
+
+region = ip2region.search("2001:4860:4860::8888")
+print(region)
