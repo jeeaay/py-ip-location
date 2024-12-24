@@ -19,7 +19,7 @@ class IP2Region:
         try:
             ip_obj = ipaddress.ip_address(self.ip)
         except Exception as e:
-            return {'errno': 1, 'data': e, 'msg': 'Invalid IP address'}
+            return {'errno': 1, 'data': str(e), 'msg': 'Invalid IP address'}
         if ip_obj.is_private:
             return {'errno': 0, 'data': {"region": '私有地址 Private IP', "ip": self.ip}, 'source': 'Private IP'}
         # 使用缓存SQLite数据库搜索IP地址
@@ -76,7 +76,7 @@ class IP2Region:
             searcher = XdbSearcher(dbfile=dbPath)
         except Exception as e:
             searcher.close()
-            return {"errno": 3, "msg": f"本地ip数据库{dbPath}读取失败", "data": e}
+            return {"errno": 3, "msg": f"本地ip数据库{dbPath}读取失败", "data": str(e)}
         try:
             # 执行查询
             region_str = searcher.searchByIPStr(self.ip)
@@ -93,7 +93,7 @@ class IP2Region:
             return {"errno": 0, "data": {"region": region_str, "ip": self.ip}, "source": "searchWithFile"}
         except Exception as e:
             searcher.close()
-            return {"errno": 2, "msg": "本地ip数据读取失败", "data": e}
+            return {"errno": 2, "msg": "本地ip数据读取失败", "data": str(e)}
 
     # description: 使用ip-api搜索IP地址
     # param: string ip
@@ -117,7 +117,7 @@ class IP2Region:
             else:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
         except Exception as e:
-            return {"errno": 2, "msg":"上游服务异常", "data": e}
+            return {"errno": 2, "msg":"上游服务异常", "data": str(e)}
 
     # description: 使用ip.sb搜索IP地址
     # param: string ip
@@ -143,7 +143,7 @@ class IP2Region:
                     region = f"{country} {region}".strip()
                 return {"errno": 0, "data":{"region": region, "ip": self.ip}, "source": "searchWithIpSb"}
         except Exception as e:
-            return {"errno": 2, "msg":"上游服务异常", "data": e}
+            return {"errno": 2, "msg":"上游服务异常", "data": str(e)}
 
     # description: 使用ipwho.is搜索IP地址
     # param: string ip
@@ -170,7 +170,7 @@ class IP2Region:
                 region = ','.join(res)
                 return {"errno": 0, "data": {"region": region, "ip": self.ip}, "source": "searchWithIpWhoIs"}
         except Exception as e:
-            return {"errno": 2, "msg":"上游服务异常", "data": e}
+            return {"errno": 2, "msg":"上游服务异常", "data": str(e)}
 
 if __name__ == "__main__":
     # 用时估算
