@@ -159,7 +159,9 @@ class IP2Region:
             if 'success' in set(data) and data['success'] == False:
                 return {"errno": 1, "msg":"没有找到IP地址", "data": data}
             else:
+                country = data['country'].strip() if 'country' in set(data) != '' else ''
                 region = data['region'].strip() if 'region' in set(data) != '' else ''
+                region = country + " " + region
                 if region == '':
                     return {"errno": 1, "msg":"没有找到IP地址", "data": data}
                 res = []
